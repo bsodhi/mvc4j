@@ -22,7 +22,6 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -37,6 +36,10 @@ import org.javamvc.core.annotations.Authorize;
  * In order to make use of ASP.NET MVC style view and controllers, you can use
  * this servlet. Following three init parameters may be supplied:
  * <ol>
+ * <li>shared.data.provider.class -- Fully qualified name of the class which 
+ * implements {@link SharedDataProvider}. If not provided then this servlet
+ * will use {@link LocalSharedDataProvider} instance as default.
+ * </li>
  * <li>controller.package.name -- Fully qualified name of the java package in
  * your application where controller classes will be placed. This is a required
  * parameter.</li>
@@ -60,17 +63,27 @@ public class ControllerServlet extends HttpServlet {
     private String controllerPkg;
     private ViewProvider viewProvider;
     public static final String EXTRA_CONFIG = "ControllerServlet.EXTRA_CONFIG";
-    private static ConcurrentHashMap sharedData;
+    private static SharedDataProvider sharedData;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        synchronized (ControllerServlet.class) {
-            if (sharedData == null) {
-                sharedData = new ConcurrentHashMap();
-                log("Initialized shared data container instance. "+sharedData);
+
+        String sharedDataClass = config.getInitParameter("shared.data.provider.class");
+        if (sharedDataClass == null) {
+            sharedData = new LocalSharedDataProvider();
+            log("Initialized shared data instance: "+sharedData);
+        } else {
+            try {
+                sharedData = (SharedDataProvider) Class.forName(sharedDataClass)
+                        .newInstance();
+            } catch (Exception ex) {
+                throw new ServletException("Could not initialize shared data provider. ", ex);
             }
+            log("Using "+sharedData.getClass().getName()+" shared data provider.");
         }
+
+        
         controllerPkg = config.getInitParameter("controller.package.name");
         if (controllerPkg != null) {
             controllerPkg = controllerPkg.trim();

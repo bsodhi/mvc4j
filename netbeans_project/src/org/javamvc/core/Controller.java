@@ -21,7 +21,6 @@ import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -42,20 +41,20 @@ public abstract class Controller {
     protected ServletContext context;
     protected HttpServletResponse response;
     protected ViewProvider viewProvider;
-    protected ConcurrentHashMap sharedData;
+    protected SharedDataProvider sharedData;
 
     /**
      * Initializes the controller instance. It injects a suitable
      * {@link ViewProvider} and also the {@link HttpServletRequest}, 
      * {@link HttpServletResponse} and {@link ServletContext} objects 
      * associated with current request.
-     * @param sharedData Shared in-memory data across the application.
+     * @param sharedData Shared data across the application.
      * @param context ServletContext reference.
      * @param req Request object being handled.
      * @param res Response object.
      * @param vp View provider instance to be used for producing the view.
      */
-    public void init(ConcurrentHashMap sharedData, ServletContext context,
+    public void init(SharedDataProvider sharedData, ServletContext context,
             HttpServletRequest req, HttpServletResponse res, ViewProvider vp) {
         this.sharedData = sharedData;
         this.context = context;
@@ -173,7 +172,7 @@ public abstract class Controller {
         return response;
     }
 
-    public ConcurrentHashMap getSharedData() {
+    public SharedDataProvider getSharedData() {
         return sharedData;
     }
 
