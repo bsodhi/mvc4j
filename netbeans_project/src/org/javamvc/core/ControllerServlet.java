@@ -36,7 +36,7 @@ import org.javamvc.core.annotations.Authorize;
  * In order to make use of ASP.NET MVC style view and controllers, you can use
  * this servlet. Following three init parameters may be supplied:
  * <ol>
- * <li>shared.data.provider.class -- Fully qualified name of the class which 
+ * <li>memcache.provider.class -- Fully qualified name of the class which 
  * implements {@link MemCacheProvider}. If not provided then this servlet
  * will use {@link LocalMemCache} instance as default.
  * </li>
@@ -63,24 +63,24 @@ public class ControllerServlet extends HttpServlet {
     private String controllerPkg;
     private ViewProvider viewProvider;
     public static final String EXTRA_CONFIG = "ControllerServlet.EXTRA_CONFIG";
-    private static MemCacheProvider sharedData;
+    private static MemCacheProvider memCache;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
 
-        String sharedDataClass = config.getInitParameter("shared.data.provider.class");
-        if (sharedDataClass == null) {
-            sharedData = new LocalMemCache();
-            log("Initialized shared data instance: "+sharedData);
+        String memcacheClass = config.getInitParameter("memcache.provider.class");
+        if (memcacheClass == null) {
+            memCache = new LocalMemCache();
+            log("Initialized memory cache provider: "+memCache);
         } else {
             try {
-                sharedData = (MemCacheProvider) Class.forName(sharedDataClass)
+                memCache = (MemCacheProvider) Class.forName(memcacheClass)
                         .newInstance();
             } catch (Exception ex) {
-                throw new ServletException("Could not initialize shared data provider. ", ex);
+                throw new ServletException("Could not initialize memory cache provider. ", ex);
             }
-            log("Using "+sharedData.getClass().getName()+" shared data provider.");
+            log("Using "+memCache.getClass().getName()+" memory cache provider.");
         }
 
         
@@ -256,7 +256,7 @@ public class ControllerServlet extends HttpServlet {
         // Invoke the controller action method
         if (isAuthorized(ctor, actCtrl[0], request)) {
             Object obj = ctor.newInstance();
-            MethodUtils.invokeMethod(obj, "init", sharedData, getServletContext(),
+            MethodUtils.invokeMethod(obj, "init", memCache, getServletContext(),
                     request, response, viewProvider);
             MethodUtils.invokeMethod(obj, actCtrl[0]);
         } else {

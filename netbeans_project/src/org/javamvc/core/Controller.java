@@ -41,22 +41,22 @@ public abstract class Controller {
     protected ServletContext context;
     protected HttpServletResponse response;
     protected ViewProvider viewProvider;
-    protected MemCacheProvider sharedData;
+    protected MemCacheProvider cache;
 
     /**
      * Initializes the controller instance. It injects a suitable
      * {@link ViewProvider} and also the {@link HttpServletRequest}, 
      * {@link HttpServletResponse} and {@link ServletContext} objects 
      * associated with current request.
-     * @param sharedData Shared data across the application.
+     * @param cache Cached data across the application.
      * @param context ServletContext reference.
      * @param req Request object being handled.
      * @param res Response object.
      * @param vp View provider instance to be used for producing the view.
      */
-    public void init(MemCacheProvider sharedData, ServletContext context,
+    public void init(MemCacheProvider cache, ServletContext context,
             HttpServletRequest req, HttpServletResponse res, ViewProvider vp) {
-        this.sharedData = sharedData;
+        this.cache = cache;
         this.context = context;
         this.request = req;
         this.response = res;
@@ -172,8 +172,8 @@ public abstract class Controller {
         return response;
     }
 
-    public MemCacheProvider getSharedData() {
-        return sharedData;
+    public MemCacheProvider getMemCache() {
+        return cache;
     }
 
     public ServletContext getContext() {
