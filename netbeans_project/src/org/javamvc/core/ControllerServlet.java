@@ -37,8 +37,8 @@ import org.javamvc.core.annotations.Authorize;
  * this servlet. Following three init parameters may be supplied:
  * <ol>
  * <li>shared.data.provider.class -- Fully qualified name of the class which 
- * implements {@link SharedDataProvider}. If not provided then this servlet
- * will use {@link LocalSharedDataProvider} instance as default.
+ * implements {@link MemCacheProvider}. If not provided then this servlet
+ * will use {@link LocalMemCache} instance as default.
  * </li>
  * <li>controller.package.name -- Fully qualified name of the java package in
  * your application where controller classes will be placed. This is a required
@@ -63,7 +63,7 @@ public class ControllerServlet extends HttpServlet {
     private String controllerPkg;
     private ViewProvider viewProvider;
     public static final String EXTRA_CONFIG = "ControllerServlet.EXTRA_CONFIG";
-    private static SharedDataProvider sharedData;
+    private static MemCacheProvider sharedData;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -71,11 +71,11 @@ public class ControllerServlet extends HttpServlet {
 
         String sharedDataClass = config.getInitParameter("shared.data.provider.class");
         if (sharedDataClass == null) {
-            sharedData = new LocalSharedDataProvider();
+            sharedData = new LocalMemCache();
             log("Initialized shared data instance: "+sharedData);
         } else {
             try {
-                sharedData = (SharedDataProvider) Class.forName(sharedDataClass)
+                sharedData = (MemCacheProvider) Class.forName(sharedDataClass)
                         .newInstance();
             } catch (Exception ex) {
                 throw new ServletException("Could not initialize shared data provider. ", ex);

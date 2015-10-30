@@ -21,7 +21,7 @@ import java.util.Set;
  *
  * @author Balwinder Sodhi
  */
-public interface SharedDataProvider<K, V> {
+public interface MemCacheProvider<K, V> {
     /**
      * Adds or replaces a key value pair in the shared data store.
      * @param key

@@ -41,7 +41,7 @@ public abstract class Controller {
     protected ServletContext context;
     protected HttpServletResponse response;
     protected ViewProvider viewProvider;
-    protected SharedDataProvider sharedData;
+    protected MemCacheProvider sharedData;
 
     /**
      * Initializes the controller instance. It injects a suitable
@@ -54,7 +54,7 @@ public abstract class Controller {
      * @param res Response object.
      * @param vp View provider instance to be used for producing the view.
      */
-    public void init(SharedDataProvider sharedData, ServletContext context,
+    public void init(MemCacheProvider sharedData, ServletContext context,
             HttpServletRequest req, HttpServletResponse res, ViewProvider vp) {
         this.sharedData = sharedData;
         this.context = context;
@@ -172,7 +172,7 @@ public abstract class Controller {
         return response;
     }
 
-    public SharedDataProvider getSharedData() {
+    public MemCacheProvider getSharedData() {
         return sharedData;
     }
 

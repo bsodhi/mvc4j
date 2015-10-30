@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author Balwinder Sodhi
  */
-public class LocalSharedDataProvider implements SharedDataProvider {
+public class LocalMemCache implements MemCacheProvider {
 
     private final ConcurrentHashMap data = new ConcurrentHashMap();
 
