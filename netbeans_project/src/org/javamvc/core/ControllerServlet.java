@@ -17,6 +17,7 @@ package org.javamvc.core;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -98,6 +99,7 @@ public class ControllerServlet extends HttpServlet {
             } catch (IOException ex) {
                 throw new ServletException("Could not load extra config. ", ex);
             }
+            log("Loaded extra config from "+extraConfig);
         }
 
         String viewProviderClass = config.getInitParameter("view.provider.class");
@@ -112,6 +114,7 @@ public class ControllerServlet extends HttpServlet {
             throw new ServletException("Could not initialize ViewProvider. ", ex);
         }
         log("Using "+viewProvider.getClass().getName()+" view provider.");
+        log("+++++++++++++++++++++ Initialization complete +++++++++++++++++++++");
     }
 
     /**
@@ -128,7 +131,7 @@ public class ControllerServlet extends HttpServlet {
         try {
             delegateAction(request, response);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log("Could not process request. ", ex);
             sendJsonErrorResponse(response,
                     HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.getLocalizedMessage());
         }
@@ -141,7 +144,12 @@ public class ControllerServlet extends HttpServlet {
 //        StringBuilder sb = new StringBuilder();
 //        sb.append("{\"status\":\"").append(httpStatus).append("\", ");
 //        sb.append("\"message\":\"").append(message).append("\"}");
-        response.getWriter().write(message);
+        PrintWriter w = response.getWriter();
+        if (w != null) {
+            w.write(message);
+        } else {
+            log("Could not send JSON error write response. ");
+        }
         response.flushBuffer();
     }
 
