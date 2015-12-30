@@ -28,7 +28,7 @@ public class LocalMemCache implements MemCacheProvider {
 
     @Override
     public void put(Object key, Object value) {
-        data.put(value, value);
+        data.put(key, value);
     }
 
     @Override

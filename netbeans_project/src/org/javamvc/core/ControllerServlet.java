@@ -46,7 +46,7 @@ import org.javamvc.core.annotations.Authorize;
  * parameter.</li>
  * <li>view.provider.class -- Fully qualified name of the class which implements
  * {@link ViewProvider}. If not specified, this servlet will use
- * {@link FreemarkerViewProvider} included in this library.</li>
+ * {@link StringViewProvider} included in this library.</li>
  * <li>template.extension -- Optionally, you can specify the extension used for
  * template files used for creating views. e.g. .html, .ftl etc.</li>
  * <li>load.extra.config -- Optionally, you can specify path to a properties
@@ -63,9 +63,18 @@ public class ControllerServlet extends HttpServlet {
 
     private String controllerPkg;
     private ViewProvider viewProvider;
+
+    /**
+     *
+     */
     public static final String EXTRA_CONFIG = "ControllerServlet.EXTRA_CONFIG";
     private static MemCacheProvider memCache;
 
+    /**
+     *
+     * @param config
+     * @throws ServletException
+     */
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
@@ -105,7 +114,7 @@ public class ControllerServlet extends HttpServlet {
         String viewProviderClass = config.getInitParameter("view.provider.class");
         if (viewProviderClass == null) {
             viewProviderClass
-                    = getClass().getPackage().getName() + ".FreemarkerViewProvider";
+                    = getClass().getPackage().getName() + ".StringViewProvider";
         }
         try {
             viewProvider = (ViewProvider) Class.forName(viewProviderClass).newInstance();
