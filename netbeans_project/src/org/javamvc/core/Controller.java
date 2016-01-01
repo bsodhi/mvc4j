@@ -32,7 +32,26 @@ import org.apache.commons.beanutils.BeanUtils;
  * keep any per-request information, i.e., a controller is expected to be a
  * stateless object. A new instance of a controller will be created for each
  * HTTP request targeted to be handled by a controller.
- *
+ * 
+ * Any view rendered via a {@link #View()} method of this class will expect the
+ * view templates to be present under <code>Views</code> directory under the web root. 
+ * For example, in case of the following content present under web root:
+ * <pre>
+ * 
+ * |-WEB-INF
+ * |-Views
+ *     |-SomeController
+ *          |-home.html
+ *          |-listing.html
+ * </pre>
+ * 
+ * invoking URL <code>http://server:port/MyContext/SomeController/home.a</code>
+ * will result in action <code>home()</code> getting called on controller named 
+ * <code>SomeController</code>. Inside <code>home()</code> you can render a
+ * view by calling suitable {@link #View()} methods. (Here we assumed that 
+ * controller servlet is configured to take all requests ending in .a). 
+ * 
+ * <b>A view can only be rendered via a controller.</b>
  * @author Balwinder Sodhi
  */
 public abstract class Controller {
@@ -194,7 +213,8 @@ public abstract class Controller {
     /**
      * Finds the template for given view name and fills it with the supplied
      * model object's data. The filled template is then sent back to client as
-     * string response.
+     * string response. View template must be present under 
+     * <code>{Web root}/Views/{Controller name}</code> folder.
      *
      * @param viewName
      * @param model
@@ -208,8 +228,9 @@ public abstract class Controller {
     /**
      * Finds the template for default view name (which is same as action name)
      * and fills it with the supplied model object's data. The filled template
-     * is then sent back to client as string response.
-     *
+     * is then sent back to client as string response. View template
+     * must be present under <code>{Web root}/Views/{Controller name}</code>
+     * folder.
      * @param model
      * @throws IOException
      */
@@ -219,7 +240,9 @@ public abstract class Controller {
 
     /**
      * Finds the template for default view name (which is same as action name)
-     * and sent the empty view back to client as string response.
+     * and sent the empty view back to client as string response. View template
+     * must be present under <code>{Web root}/Views/{Controller name}</code>
+     * folder.
      *
      * @throws IOException
      */
