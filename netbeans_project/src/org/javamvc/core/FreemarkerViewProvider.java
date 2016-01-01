@@ -27,7 +27,12 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 
 /**
- *
+ * A view provider based on Freemarker template engine. The templates are
+ * expected to be stored in some path under the web root folder of the application.
+ * Extension of template files can be configured via servlet init parameter
+ * named <code>template.extension</code>. If not configured then .html is taken
+ * as default extension of templates.
+ * 
  * @author Balwinder Sodhi
  */
 public class FreemarkerViewProvider implements ViewProvider {
@@ -37,7 +42,10 @@ public class FreemarkerViewProvider implements ViewProvider {
     
     @Override
     public void init(ServletContext servletContext, ServletConfig servletConfig) {
-        this.templateExtension = servletConfig.getInitParameter("template.extension");
+        templateExtension = servletConfig.getInitParameter("template.extension");
+        if (null == templateExtension) {
+            templateExtension = ".html";
+        }
         // Specify the data source where the template files come from. Here I set a
         // plain directory for it, but non-file-system are possible too:
         //cfg.setDirectoryForTemplateLoading(new File("."));
