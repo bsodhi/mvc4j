@@ -21,6 +21,7 @@ import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 import java.util.Properties;
+import java.util.logging.Logger;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -61,6 +62,7 @@ public abstract class Controller {
     protected HttpServletResponse response;
     protected ViewProvider viewProvider;
     protected MemCacheProvider cache;
+    private Logger logger = Logger.getLogger(Controller.class.getName());
 
     /**
      * Initializes the controller instance. It injects a suitable
@@ -160,7 +162,9 @@ public abstract class Controller {
         } finally {
             reader.close();
         }
-        return sb.toString();
+        String json = sb.toString();
+        logger.fine("JSON data extracted from request: "+json);
+        return json;
     }
 
     /**
@@ -207,6 +211,7 @@ public abstract class Controller {
      * @throws IOException 
      */
     public String populateTemplate(String templatePath, Object model) throws IOException {
+        logger.fine("Populating template "+templatePath+" with model: "+model);
         return viewProvider.renderView(templatePath, model);
     }
 
@@ -222,6 +227,7 @@ public abstract class Controller {
      */
     public void View(String viewName, Object model) throws IOException {
         String result = viewProvider.renderView(findViewName(viewName), model);
+        logger.fine("Rendered view: "+result);
         sendViewResponse(result);
     }
 
@@ -282,6 +288,7 @@ public abstract class Controller {
         PrintWriter w = response.getWriter();
         w.write(json);
         w.flush();
+        logger.fine("Sent JSON response: "+json);
     }
 
     /**
@@ -313,6 +320,7 @@ public abstract class Controller {
         }
         String ct = getClass().getSimpleName();
         String view = "Views/" + ct + "/" + viewNm;
+        logger.fine("View path: "+view);
         return view;
     }
 

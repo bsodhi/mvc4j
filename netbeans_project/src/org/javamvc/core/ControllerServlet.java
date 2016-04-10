@@ -310,36 +310,60 @@ public class ControllerServlet extends HttpServlet {
         if (null == a) {
             return true;
         }
-        /**
-         * If annotation is found but no "roles" attribute in session then we
-         * don't authorize. A properly authenticated user is expected to have a
-         * "roles" attribute in session.
-         */
-        String[] userRoles = (String[]) request.getSession().getAttribute("roles");
-        if (userRoles == null || userRoles.length < 1) {
-            log("Attribute 'role' not found in session. Will not authorize request.");
+        
+        AuthContext authCtx = (AuthContext) request.getSession().getAttribute("auth.context");
+        // User must be in authenticated state
+        if (null == authCtx || !authCtx.isAuthenticated()) {
             return false;
         }
-        /**
-         * If a role matching the one specified in annotation is found then we
-         * authorize, else we do not.
-         */
+        
+        boolean authorized = false;
         String[] roles = a.roles();
         if (roles != null && roles.length > 0) {
             List list = Arrays.asList(roles);
-            boolean authorized = list.contains("*");
+            authorized = list.contains("*");
             if (!authorized) {
-                for (String r : userRoles) {
-                    authorized = list.contains(r);
-                    if (authorized) {
+                for (String role : roles) {
+                    if (authCtx.hasRole(role)) {
+                        authorized = true;
                         break;
                     }
                 }
             }
-            return authorized;
-        } else {
-            return false;
         }
+        log("Action "+methodName+" is authorized: "+authorized);
+        return authorized;
+        
+//        /**
+//         * If annotation is found but no "roles" attribute in session then we
+//         * don't authorize. A properly authenticated user is expected to have a
+//         * "roles" attribute in session.
+//         */
+//        String[] userRoles = (String[]) request.getSession().getAttribute("roles");
+//        if (userRoles == null || userRoles.length < 1) {
+//            log("Attribute 'roles' not found in session. Will not authorize request.");
+//            return false;
+//        }
+//        /**
+//         * If a role matching the one specified in annotation is found then we
+//         * authorize, else we do not.
+//         */
+//        String[] roles = a.roles();
+//        if (roles != null && roles.length > 0) {
+//            List list = Arrays.asList(roles);
+//            boolean authorized = list.contains("*");
+//            if (!authorized) {
+//                for (String r : userRoles) {
+//                    authorized = list.contains(r);
+//                    if (authorized) {
+//                        break;
+//                    }
+//                }
+//            }
+//            return authorized;
+//        } else {
+//            return false;
+//        }
     }
 
 }
